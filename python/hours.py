@@ -10,7 +10,11 @@ from dateutil import tz
 
 parser = argparse.ArgumentParser(description='Calculate hours since given time')
 parser.add_argument('timestring', type=str, help='ISO formatted time or HH:MM')
-parser.add_argument('--timezone', required=False, type=str, help='Current timezone')   #default='Europe/Oslo',
+parser.add_argument('--timezone', required=False, 
+                    type=str, help='Current timezone')   #default='Europe/Oslo',
+parser.add_argument('--paid-lunch', dest='paid_lunch', action='store_true',
+                    help='Add this flag if you have paid lunchbreak (30 min)')
+parser.set_defaults(paid_lunch=False)
 
 args = parser.parse_args()
 
@@ -28,4 +32,8 @@ else:
 a = a.astimezone(t).astimezone(dt.timezone.utc)
 b = dt.datetime.utcnow().replace(tzinfo=dt.timezone.utc)
 t = (b - a).total_seconds() / 3600
+
+if not args.paid_lunch:
+    t -= .5
+
 print(f'{t:.2f} (7.5 + {t-7.5:.2f})')
